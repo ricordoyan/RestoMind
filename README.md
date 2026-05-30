@@ -54,8 +54,8 @@ are never exposed to the browser.
    # then edit .env.local with your real OpenAI and Google Maps keys
    ```
 
-   Enable the **Geocoding API**, **Places API**, and **Maps JavaScript API**
-   for your Google Maps key.
+   See [API Keys](#api-keys) below for how to obtain each key. Then restart
+   the dev server — Next.js only reads env files at startup.
 
 3. Run the dev server:
 
@@ -64,6 +64,59 @@ are never exposed to the browser.
    ```
 
    Open [http://localhost:3000](http://localhost:3000).
+
+## API Keys
+
+This app requires **two keys**, and you must obtain them yourself — they are
+tied to your own accounts and billing, so they cannot be shipped in the repo.
+Both are read **server-side** (the app never exposes them to the browser) and
+live in a local `.env.local` file that is gitignored.
+
+```
+OPENAI_API_KEY=sk-...your real key...
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIza...your real key...
+```
+
+> ⚠️ Never commit `.env.local`. It is already in `.gitignore` so your keys stay
+> private.
+
+### Google Maps API key
+
+Used for Geocoding, Places Nearby Search, Place Details, and the address
+Autocomplete widget on the location wizard. Without it you'll see
+*"Google Maps API key is not configured"* on the Review step.
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/) and
+   sign in.
+2. Create a project (or select an existing one).
+3. **Enable billing** on the project. Google provides a large free monthly
+   credit and this app's usage is tiny, but a payment method is required to
+   activate the Maps APIs.
+4. Open **APIs & Services → Library** and enable all three:
+   - **Geocoding API**
+   - **Places API**
+   - **Maps JavaScript API**
+5. Open **APIs & Services → Credentials → Create Credentials → API key** and
+   copy the key into `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`.
+6. (Recommended) Restrict the key to your domain / localhost and to the three
+   APIs above so it can't be misused.
+
+### OpenAI API key
+
+Powers every AI feature (location analysis, design, procurement, marketing,
+menu engineering). Without it, "Generate AI Report" fails with
+*"OpenAI API key is not configured"*.
+
+1. Go to [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+   and sign in.
+2. Click **Create new secret key** and copy it (it is shown only once) into
+   `OPENAI_API_KEY`.
+3. Make sure the account has billing credit — the reports use the GPT-4o model.
+
+### After adding keys
+
+Restart the dev server (`Ctrl+C`, then `npm run dev` again). Env files are only
+read at startup, so changes won't take effect until you restart.
 
 ## Scripts
 
