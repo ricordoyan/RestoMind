@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Restaurant Co-Pilot
+
+An AI co-pilot for restaurant operators and investors. Evaluate a potential
+location against **real** competitor data, then plan the interior, procurement,
+marketing, and menu — all powered by GPT-4o and grounded in structured data so
+the model can't hallucinate numbers.
+
+Built with Next.js 16 (App Router, Turbopack), React 19, Tailwind v4,
+shadcn/ui, and the OpenAI + Google Maps Platform APIs.
+
+## Features
+
+1. **Location Analysis** (`/analyze` → `/report/[id]`)
+   - A 5-step required-field wizard: location (Google Places Autocomplete),
+     cuisine, business model (takeover vs. lease, with model-specific fields),
+     finances, and a review step.
+   - The form is validated client-side at every step **and** re-validated
+     server-side with Zod — no report is generated on an incomplete form.
+   - The API route geocodes the address, pulls nearby restaurants via Places
+     Nearby Search (1 km) enriched with Place Details (rating, price level,
+     review count, types), assembles everything into a structured JSON payload,
+     and only then sends it to GPT-4o. The prompt forces the model to base all
+     analysis on the provided data and to say "Insufficient data" rather than
+     invent figures.
+   - The report includes an attractiveness score (1–10), a competitor table,
+     foot-traffic and revenue estimates, top risks, negotiation advice,
+     a menu-pricing sweet spot, and a final verdict.
+2. **AI Design Assistant** (`/design`) — upload a photo of the space or enter
+   square footage + style, and get a layout plan, mood board, budget tips, and
+   reference descriptions.
+3. **Smart Procurement** (`/procurement`) — equipment & smallwares checklist by
+   category with new vs. used price estimates, scam-avoidance tips, and
+   marketplace search links (eBay, Facebook Marketplace, WebstaurantStore).
+4. **Marketing Co-Pilot** (`/marketing`) — social captions, a logo concept, a
+   grand-opening plan, and a 30-day marketing checklist.
+5. **Menu Engineer** (`/menu-engineer`) — per-dish profit-margin analysis,
+   price adjustments, star dishes, unprofitable flags, and layout tips.
+
+All AI calls run **server-side** in API routes (`src/app/api/*`) so the keys
+are never exposed to the browser.
 
 ## Getting Started
 
-First, run the development server:
+1. Install dependencies:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+   ```bash
+   npm install
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Configure your keys:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   ```bash
+   cp .env.example .env.local
+   # then edit .env.local with your real OpenAI and Google Maps keys
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   Enable the **Geocoding API**, **Places API**, and **Maps JavaScript API**
+   for your Google Maps key.
 
-## Learn More
+3. Run the dev server:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   Open [http://localhost:3000](http://localhost:3000).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run dev` — start the dev server
+- `npm run build` — production build
+- `npm run start` — serve the production build
+- `npm run lint` — run ESLint
