@@ -1,20 +1,15 @@
 import { NextResponse } from "next/server";
-import { Client } from "@googlemaps/google-maps-services-js";
-import OpenAI from "openai";
-import { analysisFormSchema } from "@/lib/schemas";
 import { ZodError } from "zod";
-
-const client = new Client({});
-
-function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
+import { analysisFormSchema } from "@/lib/schemas";
+import {
+  getGoogleMapsKey,
+  getOpenAIClient,
+  geocodeAddress,
+  findNearbyRestaurants,
+  enrichWithPlaceDetails,
+  haversineDistance,
+  type CompetitorDetail,
+} from "@/lib/places";
 
 const SYSTEM_PROMPT = `You are an expert restaurant location analyst. You receive structured JSON data about a proposed restaurant location and its nearby competitors. Produce a comprehensive, data-grounded analysis.
 
@@ -57,86 +52,6 @@ Output valid JSON matching this schema:
   "verdict": "good_deal" | "proceed_with_caution" | "avoid"
 }`;
 
-type CompetitorDetail = {
-  name: string;
-  types: string[];
-  rating: number | null;
-  priceLevel: number | null;
-  userRatingsTotal: number | null;
-  placeId: string;
-  vicinity: string;
-  lat: number;
-  lng: number;
-};
-
-async function geocodeAddress(address: string): Promise<{ lat: number; lng: number; formattedAddress: string }> {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!;
-  const geoRes = await client.geocode({
-    params: { address, key: apiKey },
-    timeout: 5000,
-  });
-  if (!geoRes.data.results.length) {
-    throw new Error("Address could not be geocoded. Please enter a valid address.");
-  }
-  const { lat, lng } = geoRes.data.results[0].geometry.location;
-  return { lat, lng, formattedAddress: geoRes.data.results[0].formatted_address };
-}
-
-async function findNearbyRestaurants(lat: number, lng: number): Promise<CompetitorDetail[]> {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!;
-  const placesRes = await client.placesNearby({
-    params: {
-      location: { lat, lng },
-      radius: 1000,
-      type: "restaurant",
-      key: apiKey,
-    },
-    timeout: 5000,
-  });
-  return (placesRes.data.results || []).slice(0, 10).map((p) => ({
-    name: p.name || "Unknown",
-    types: p.types || [],
-    rating: p.rating || null,
-    priceLevel: p.price_level ?? null,
-    userRatingsTotal: p.user_ratings_total || null,
-    placeId: p.place_id || "",
-    vicinity: p.vicinity || "",
-    lat: p.geometry?.location?.lat || 0,
-    lng: p.geometry?.location?.lng || 0,
-  }));
-}
-
-async function enrichWithPlaceDetails(competitors: CompetitorDetail[]): Promise<CompetitorDetail[]> {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!;
-  const enriched = await Promise.all(
-    competitors.map(async (comp) => {
-      if (!comp.placeId) return comp;
-      try {
-        const detailRes = await client.placeDetails({
-          params: {
-            place_id: comp.placeId,
-            key: apiKey,
-            fields: ["name", "rating", "price_level", "types", "user_ratings_total", "formatted_address", "geometry"],
-          },
-          timeout: 3000,
-        });
-        const d = detailRes.data.result;
-        return {
-          ...comp,
-          rating: d.rating ?? comp.rating,
-          priceLevel: d.price_level ?? comp.priceLevel,
-          types: d.types || comp.types,
-          userRatingsTotal: d.user_ratings_total ?? comp.userRatingsTotal,
-          vicinity: d.formatted_address || comp.vicinity,
-        };
-      } catch {
-        return comp;
-      }
-    })
-  );
-  return enriched;
-}
-
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -149,21 +64,9 @@ export async function POST(req: Request) {
     const { address, cuisine, model, takeoverDetails, leaseDetails, budget, targetRevenue } = parsed.data;
     let coordinates = parsed.data.coordinates;
 
-    const googleMapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-    const openAIKey = process.env.OPENAI_API_KEY;
-
-    if (!googleMapsKey || googleMapsKey === "your_google_maps_api_key_here") {
-      return NextResponse.json(
-        { error: "Google Maps API key is not configured. Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to .env.local" },
-        { status: 500 }
-      );
-    }
-    if (!openAIKey || openAIKey === "your_openai_api_key_here") {
-      return NextResponse.json(
-        { error: "OpenAI API key is not configured. Add OPENAI_API_KEY to .env.local" },
-        { status: 500 }
-      );
-    }
+    // Validate keys up-front so the user gets a clear message before any work.
+    getGoogleMapsKey();
+    const openai = getOpenAIClient();
 
     let formattedAddress = address;
     if (!coordinates || !coordinates.lat) {
@@ -172,7 +75,7 @@ export async function POST(req: Request) {
       formattedAddress = geo.formattedAddress;
     }
 
-    const rawCompetitors = await findNearbyRestaurants(coordinates.lat, coordinates.lng);
+    const rawCompetitors = await findNearbyRestaurants(coordinates.lat, coordinates.lng, 1000, 10);
     let competitors: CompetitorDetail[] = [];
     if (rawCompetitors.length > 0) {
       competitors = await enrichWithPlaceDetails(rawCompetitors);
@@ -219,7 +122,6 @@ export async function POST(req: Request) {
       competitorCount: competitorData.length,
     };
 
-    const openai = new OpenAI({ apiKey: openAIKey });
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [

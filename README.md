@@ -1,14 +1,24 @@
 # Restaurant Co-Pilot
 
-An AI co-pilot for restaurant operators and investors. Evaluate a potential
-location against **real** competitor data, then plan the interior, procurement,
-marketing, and menu — all powered by GPT-4o and grounded in structured data so
-the model can't hallucinate numbers.
+AI **location intelligence** for restaurants, inspired by platforms like
+SiteZeus. Decide *where* to open against **real** competitor data — score a
+site, map its trade area, scout white-space markets, and check cannibalization
+— then plan the interior, procurement, marketing, and menu. Everything is
+powered by GPT-4o and grounded in structured Google Places data so the model
+can't hallucinate numbers.
 
 Built with Next.js 16 (App Router, Turbopack), React 19, Tailwind v4,
 shadcn/ui, and the OpenAI + Google Maps Platform APIs.
 
+The app is organized into a three-stage suite, surfaced on the landing page:
+
+- **Locate** — Location Analysis, Trade Area Analysis, Market Scout, Impact Analysis
+- **Build** — Interior Design, Smart Procurement
+- **Grow** — Marketing Co-Pilot, Menu Engineer
+
 ## Features
+
+### Locate — decide where to open
 
 1. **Location Analysis** (`/analyze` → `/report/[id]`)
    - A 5-step required-field wizard: location (Google Places Autocomplete),
@@ -25,15 +35,35 @@ shadcn/ui, and the OpenAI + Google Maps Platform APIs.
    - The report includes an attractiveness score (1–10), a competitor table,
      foot-traffic and revenue estimates, top risks, negotiation advice,
      a menu-pricing sweet spot, and a final verdict.
-2. **AI Design Assistant** (`/design`) — upload a photo of the space or enter
+2. **Trade Area Analysis** (`/trade-area` → `/trade-area-report/[id]`) — breaks
+   a location into concentric rings (0–0.5 / 0.5–1 / 1–1.5 km) and reports
+   competitor density, a saturation score, an estimated customer profile,
+   drive-time reach, and opportunities/threats — all derived from live Places
+   data, with estimates clearly labelled.
+3. **Market Scout** (`/market-scout` → `/market-scout-report/[id]`) —
+   white-space analysis: geocodes a city, proposes candidate neighborhoods,
+   grounds each with real competitor counts, then ranks them by an opportunity
+   score so you can see where demand likely outpaces same-cuisine competition.
+4. **Impact Analysis** (`/impact` → `/impact-report/[id]`) — cannibalization
+   check for a second location: measures the distance between an existing and a
+   proposed site, then estimates trade-area overlap and the share of sales that
+   would transfer. Clearly framed as a directional estimate (no mobile-visit
+   data).
+
+### Build — open the doors
+
+5. **AI Design Assistant** (`/design`) — upload a photo of the space or enter
    square footage + style, and get a layout plan, mood board, budget tips, and
    reference descriptions.
-3. **Smart Procurement** (`/procurement`) — equipment & smallwares checklist by
+6. **Smart Procurement** (`/procurement`) — equipment & smallwares checklist by
    category with new vs. used price estimates, scam-avoidance tips, and
    marketplace search links (eBay, Facebook Marketplace, WebstaurantStore).
-4. **Marketing Co-Pilot** (`/marketing`) — social captions, a logo concept, a
+
+### Grow — fill seats, protect margins
+
+7. **Marketing Co-Pilot** (`/marketing`) — social captions, a logo concept, a
    grand-opening plan, and a 30-day marketing checklist.
-5. **Menu Engineer** (`/menu-engineer`) — per-dish profit-margin analysis,
+8. **Menu Engineer** (`/menu-engineer`) — per-dish profit-margin analysis,
    price adjustments, star dishes, unprofitable flags, and layout tips.
 
 All AI calls run **server-side** in API routes (`src/app/api/*`) so the keys

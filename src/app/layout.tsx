@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Restaurant Co-Pilot | AI Location Advisor",
-  description: "AI-powered restaurant location advisor that helps aspiring restaurateurs evaluate a potential business location for sale or lease.",
+  title: "Restaurant Co-Pilot | AI Location Intelligence for Restaurants",
+  description:
+    "AI-powered location intelligence for restaurants. Score a site, forecast revenue, map the trade area, find white-space markets, and avoid cannibalization — then design, procure, market, and engineer your menu. Grounded in live Google Places data and GPT-4o.",
 };
 
 export default function RootLayout({
