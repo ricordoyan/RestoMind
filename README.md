@@ -1,11 +1,18 @@
 # Restaurant Co-Pilot
 
-AI **location intelligence** for restaurants, inspired by platforms like
-SiteZeus. Decide *where* to open against **real** competitor data — score a
-site, map its trade area, scout white-space markets, and check cannibalization
-— then plan the interior, procurement, marketing, and menu. Everything is
-powered by GPT-4o and grounded in structured Google Places data so the model
-can't hallucinate numbers.
+An AI co-pilot for the **whole restaurant lifecycle** — from picking a site to
+running it day-to-day. Decide *where* to open against **real** competitor data
+(inspired by location-intelligence platforms like SiteZeus), open the doors,
+then run operations like a seasoned manager (inspired by operations platforms
+like Restoke.ai), and grow.
+
+Score a site, map its trade area, scout white-space markets and check
+cannibalization → design the interior and procure equipment → cost recipes,
+manage inventory and ordering, generate ops checklists and staff training, and
+chat with an operations copilot → market the opening and engineer the menu.
+Everything is powered by GPT-4o; the location tools are grounded in structured
+Google Places data, and figures that can be exact (food cost, order quantities)
+are computed deterministically — so the model can't hallucinate numbers.
 
 Built with Next.js 16 (App Router, Turbopack), React 19, Tailwind v4,
 shadcn/ui, and the OpenAI + Google Maps Platform APIs.
@@ -133,9 +140,11 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIza...your real key...
 
 ### Google Maps API key
 
-Used for Geocoding, Places Nearby Search, Place Details, and the address
-Autocomplete widget on the location wizard. Without it you'll see
-*"Google Maps API key is not configured"* on the Review step.
+Required by the **Locate** tools — Location Analysis, Trade Area Analysis,
+Market Scout, and Impact Analysis — for Geocoding, Places Nearby Search, Place
+Details, and the address Autocomplete widget. Without it you'll see *"Google
+Maps API key is not configured"*. (The Build, Operate, and Grow tools are
+GPT-only and don't need this key.)
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com/) and
    sign in.
@@ -154,8 +163,8 @@ Autocomplete widget on the location wizard. Without it you'll see
 
 ### OpenAI API key
 
-Powers every AI feature (location analysis, design, procurement, marketing,
-menu engineering). Without it, "Generate AI Report" fails with
+Powers every AI feature across all four stages (Locate, Build, Operate, Grow) —
+including the Operations Copilot chat. Without it, report generation fails with
 *"OpenAI API key is not configured"*.
 
 1. Go to [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
