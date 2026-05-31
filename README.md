@@ -10,11 +10,15 @@ can't hallucinate numbers.
 Built with Next.js 16 (App Router, Turbopack), React 19, Tailwind v4,
 shadcn/ui, and the OpenAI + Google Maps Platform APIs.
 
-The app is organized into a three-stage suite, surfaced on the landing page:
+The app is organized into a four-stage suite, surfaced on the landing page:
 
 - **Locate** — Location Analysis, Trade Area Analysis, Market Scout, Impact Analysis
 - **Build** — Interior Design, Smart Procurement
+- **Operate** — Recipe & Food Cost, Inventory & Ordering, Ops Playbook, Operations Copilot
 - **Grow** — Marketing Co-Pilot, Menu Engineer
+
+The **Operate** stage is inspired by operations platforms like Restoke.ai, adapted
+to run on GPT-4o with no POS/database integration required.
 
 ## Features
 
@@ -59,12 +63,29 @@ The app is organized into a three-stage suite, surfaced on the landing page:
    category with new vs. used price estimates, scam-avoidance tips, and
    marketplace search links (eBay, Facebook Marketplace, WebstaurantStore).
 
+### Operate — run the day-to-day (inspired by Restoke.ai)
+
+7. **Recipe & Food Cost** (`/recipe-cost` → `/recipe-cost-report/[id]`) — build a
+   recipe from its ingredients; the server computes total cost, cost per serving,
+   food-cost %, and margin deterministically, then GPT-4o flags the expensive
+   ingredients and recommends a price for a target food-cost %.
+8. **Inventory & Ordering** (`/inventory` → `/inventory-report/[id]`) — enter stock
+   vs. par levels; the app auto-calculates order quantities, flags low/critical
+   items, totals the order cost, and GPT suggests par levels, an ordering
+   schedule, and waste-reduction tips.
+9. **Ops Playbook** (`/playbook` → `/playbook-report/[id]`) — generates
+   opening/closing/weekly checklists, food-safety SOPs, role-based training
+   modules, and a first-week onboarding plan for your cuisine and service style.
+10. **Operations Copilot** (`/copilot`) — a chat with an AI restaurant manager for
+    food cost, inventory, staffing, menu, and operations questions (conversation
+    persists locally in the browser).
+
 ### Grow — fill seats, protect margins
 
-7. **Marketing Co-Pilot** (`/marketing`) — social captions, a logo concept, a
-   grand-opening plan, and a 30-day marketing checklist.
-8. **Menu Engineer** (`/menu-engineer`) — per-dish profit-margin analysis,
-   price adjustments, star dishes, unprofitable flags, and layout tips.
+11. **Marketing Co-Pilot** (`/marketing`) — social captions, a logo concept, a
+    grand-opening plan, and a 30-day marketing checklist.
+12. **Menu Engineer** (`/menu-engineer`) — per-dish profit-margin analysis,
+    price adjustments, star dishes, unprofitable flags, and layout tips.
 
 All AI calls run **server-side** in API routes (`src/app/api/*`) so the keys
 are never exposed to the browser.

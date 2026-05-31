@@ -15,6 +15,10 @@ import {
   TrendingUp,
   Search,
   ClipboardList,
+  Calculator,
+  Package,
+  ListChecks,
+  Bot,
 } from "lucide-react";
 
 type Tool = {
@@ -84,6 +88,42 @@ const SUITE: { id: string; label: string; tagline: string; accent: string; tools
     ],
   },
   {
+    id: "operate",
+    label: "Operate",
+    tagline: "Run the day-to-day like a seasoned manager.",
+    accent: "from-sky-500 to-blue-500",
+    tools: [
+      {
+        href: "/recipe-cost",
+        title: "Recipe & Food Cost",
+        description:
+          "Cost a recipe from its ingredients — food-cost %, margin, expensive-ingredient flags, and pricing advice.",
+        icon: <Calculator className="text-lime-400" />,
+      },
+      {
+        href: "/inventory",
+        title: "Inventory & Ordering",
+        description:
+          "Track stock against par levels, auto-calculate what to order, flag low stock, and optimize ordering schedules.",
+        icon: <Package className="text-sky-400" />,
+      },
+      {
+        href: "/playbook",
+        title: "Ops Playbook",
+        description:
+          "Generate opening/closing checklists, food-safety SOPs, and role-based staff training and onboarding plans.",
+        icon: <ListChecks className="text-indigo-400" />,
+      },
+      {
+        href: "/copilot",
+        title: "Operations Copilot",
+        description:
+          "Chat with an AI restaurant manager about food cost, inventory, staffing, menu, and daily operations.",
+        icon: <Bot className="text-teal-400" />,
+      },
+    ],
+  },
+  {
     id: "grow",
     label: "Grow",
     tagline: "Fill seats and protect your margins.",
@@ -144,6 +184,7 @@ export default function Home() {
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           <a href="#locate" className="text-slate-300 hover:text-white transition-colors">Locate</a>
           <a href="#build" className="text-slate-300 hover:text-white transition-colors">Build</a>
+          <a href="#operate" className="text-slate-300 hover:text-white transition-colors">Operate</a>
           <a href="#grow" className="text-slate-300 hover:text-white transition-colors">Grow</a>
           <a href="#how" className="text-slate-300 hover:text-white transition-colors">How it works</a>
         </nav>
@@ -171,9 +212,9 @@ export default function Home() {
             </h1>
 
             <p className="text-lg md:text-xl text-slate-300 max-w-2xl leading-relaxed">
-              Restaurant Co-Pilot scores a site, forecasts revenue, maps the trade area, finds
-              white-space markets, and flags cannibalization — then helps you design, procure,
-              market, and engineer your menu. One co-pilot for the whole journey.
+              Restaurant Co-Pilot scores a site, forecasts revenue, maps the trade area, and finds
+              white-space markets — then helps you design, procure, run food cost, inventory and
+              staff training, market, and engineer your menu. One co-pilot for the whole journey.
             </p>
 
             <div className="pt-2 flex flex-col sm:flex-row gap-4 items-center">
@@ -231,9 +272,9 @@ export default function Home() {
         {/* The Suite */}
         <section className="max-w-7xl mx-auto px-4 py-12">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white">One platform, three stages</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white">One platform, four stages</h2>
             <p className="text-slate-400 mt-3 max-w-2xl mx-auto">
-              Everything an operator needs to go from &ldquo;where?&rdquo; to &ldquo;open&rdquo; to &ldquo;profitable.&rdquo;
+              Everything an operator needs to go from &ldquo;where?&rdquo; to &ldquo;open&rdquo; to &ldquo;running&rdquo; to &ldquo;profitable.&rdquo;
             </p>
           </div>
 
