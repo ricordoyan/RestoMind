@@ -79,11 +79,22 @@ export function PlacesAutocomplete({ value, onChange, onError, disabled }: Props
   );
   const [inputValue, setInputValue] = useState(value);
 
+  // Keep a stable reference to the latest onError so the error-reporting effect
+  // does not depend on the callback's identity. Parents often pass a new inline
+  // onError on every render; depending on it here caused an infinite
+  // setState -> re-render -> effect loop ("Maximum update depth exceeded").
+  const onErrorRef = useRef(onError);
   useEffect(() => {
-    if (scriptState === "error") {
-      onError?.("Maps autocomplete unavailable. You can still type the address.");
+    onErrorRef.current = onError;
+  }, [onError]);
+  const errorReportedRef = useRef(false);
+
+  useEffect(() => {
+    if (scriptState === "error" && !errorReportedRef.current) {
+      errorReportedRef.current = true;
+      onErrorRef.current?.("Maps autocomplete unavailable. You can still type the address.");
     }
-  }, [scriptState, onError]);
+  }, [scriptState]);
 
   useEffect(() => {
     if (scriptState === "loaded" || scriptState === "error") return;

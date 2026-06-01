@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Restaurant Co-Pilot",
+    "slug": "restaurant-copilot",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "restocopilot",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.restomind.copilot"
+    },
+    "android": {
+      "package": "com.restomind.copilot"
+    },
+    "plugins": ["expo-router"],
+    "extra": {
+      "apiBaseUrl": "http://localhost:3000"
+    }
+  }
+}

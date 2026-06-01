@@ -1,11 +1,18 @@
 # Restaurant Co-Pilot
 
-AI **location intelligence** for restaurants, inspired by platforms like
-SiteZeus. Decide *where* to open against **real** competitor data — score a
-site, map its trade area, scout white-space markets, and check cannibalization
-— then plan the interior, procurement, marketing, and menu. Everything is
-powered by GPT-4o and grounded in structured Google Places data so the model
-can't hallucinate numbers.
+An AI co-pilot for the **whole restaurant lifecycle** — from picking a site to
+running it day-to-day. Decide *where* to open against **real** competitor data
+(inspired by location-intelligence platforms like SiteZeus), open the doors,
+then run operations like a seasoned manager (inspired by operations platforms
+like Restoke.ai), and grow.
+
+Score a site, map its trade area, scout white-space markets and check
+cannibalization → design the interior and procure equipment → cost recipes,
+manage inventory and ordering, generate ops checklists and staff training, and
+chat with an operations copilot → market the opening and engineer the menu.
+Everything is powered by GPT-4o; the location tools are grounded in structured
+Google Places data, and figures that can be exact (food cost, order quantities)
+are computed deterministically — so the model can't hallucinate numbers.
 
 Built with Next.js 16 (App Router, Turbopack), React 19, Tailwind v4,
 shadcn/ui, and the OpenAI + Google Maps Platform APIs.
@@ -19,6 +26,31 @@ The app is organized into a four-stage suite, surfaced on the landing page:
 
 The **Operate** stage is inspired by operations platforms like Restoke.ai, adapted
 to run on GPT-4o with no POS/database integration required.
+
+## Screenshots
+
+| Landing — the four-stage suite | Location Analysis wizard |
+| --- | --- |
+| [![Landing page](docs/screenshots/landing.png)](docs/screenshots/landing.png) | [![Location Analysis](docs/screenshots/analyze.png)](docs/screenshots/analyze.png) |
+
+| Trade Area Analysis | Market Scout (white space) |
+| --- | --- |
+| [![Trade Area](docs/screenshots/trade-area.png)](docs/screenshots/trade-area.png) | [![Market Scout](docs/screenshots/market-scout.png)](docs/screenshots/market-scout.png) |
+
+| Impact Analysis (cannibalization) | Recipe & Food Cost |
+| --- | --- |
+| [![Impact Analysis](docs/screenshots/impact.png)](docs/screenshots/impact.png) | [![Recipe & Food Cost](docs/screenshots/recipe-cost.png)](docs/screenshots/recipe-cost.png) |
+
+| Inventory & Ordering | Ops Playbook |
+| --- | --- |
+| [![Inventory & Ordering](docs/screenshots/inventory.png)](docs/screenshots/inventory.png) | [![Ops Playbook](docs/screenshots/playbook.png)](docs/screenshots/playbook.png) |
+
+| Operations Copilot | Interior Design |
+| --- | --- |
+| [![Operations Copilot](docs/screenshots/copilot.png)](docs/screenshots/copilot.png) | [![Interior Design](docs/screenshots/design.png)](docs/screenshots/design.png) |
+
+> Regenerate these with `npm run screenshots` (see
+> [Generating screenshots](#generating-screenshots)).
 
 ## Features
 
@@ -133,9 +165,11 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIza...your real key...
 
 ### Google Maps API key
 
-Used for Geocoding, Places Nearby Search, Place Details, and the address
-Autocomplete widget on the location wizard. Without it you'll see
-*"Google Maps API key is not configured"* on the Review step.
+Required by the **Locate** tools — Location Analysis, Trade Area Analysis,
+Market Scout, and Impact Analysis — for Geocoding, Places Nearby Search, Place
+Details, and the address Autocomplete widget. Without it you'll see *"Google
+Maps API key is not configured"*. (The Build, Operate, and Grow tools are
+GPT-only and don't need this key.)
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com/) and
    sign in.
@@ -154,8 +188,8 @@ Autocomplete widget on the location wizard. Without it you'll see
 
 ### OpenAI API key
 
-Powers every AI feature (location analysis, design, procurement, marketing,
-menu engineering). Without it, "Generate AI Report" fails with
+Powers every AI feature across all four stages (Locate, Build, Operate, Grow) —
+including the Operations Copilot chat. Without it, report generation fails with
 *"OpenAI API key is not configured"*.
 
 1. Go to [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
@@ -175,3 +209,89 @@ read at startup, so changes won't take effect until you restart.
 - `npm run build` — production build
 - `npm run start` — serve the production build
 - `npm run lint` — run ESLint
+- `npm run screenshots` — regenerate the README screenshots (see below)
+
+## Project Structure
+
+```
+RestoMind/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx                 # Landing page — the Locate/Build/Operate/Grow suite
+│   │   ├── layout.tsx               # Root layout + metadata
+│   │   ├── globals.css              # Tailwind v4 theme tokens
+│   │   │
+│   │   ├── analyze/                 # Locate · Location Analysis (5-step wizard)
+│   │   ├── report/[id]/             #   └─ its report
+│   │   ├── trade-area/              # Locate · Trade Area Analysis
+│   │   ├── trade-area-report/[id]/
+│   │   ├── market-scout/            # Locate · Market Scout (white space)
+│   │   ├── market-scout-report/[id]/
+│   │   ├── impact/                  # Locate · Impact Analysis (cannibalization)
+│   │   ├── impact-report/[id]/
+│   │   │
+│   │   ├── design/                  # Build · Interior Design
+│   │   ├── design-report/[id]/
+│   │   ├── procurement/             # Build · Smart Procurement
+│   │   ├── procurement-report/[id]/
+│   │   │
+│   │   ├── recipe-cost/             # Operate · Recipe & Food Cost
+│   │   ├── recipe-cost-report/[id]/
+│   │   ├── inventory/               # Operate · Inventory & Ordering
+│   │   ├── inventory-report/[id]/
+│   │   ├── playbook/                # Operate · Ops Playbook
+│   │   ├── playbook-report/[id]/
+│   │   ├── copilot/                 # Operate · Operations Copilot (chat)
+│   │   │
+│   │   ├── marketing/               # Grow · Marketing Co-Pilot
+│   │   ├── marketing-report/[id]/
+│   │   ├── menu-engineer/           # Grow · Menu Engineer
+│   │   ├── menu-engineer-report/[id]/
+│   │   │
+│   │   └── api/                     # Server-side routes (one per feature) — keys never reach the browser
+│   │       ├── analyze/  trade-area/  market-scout/  impact/
+│   │       ├── design/  procurement/
+│   │       ├── recipe-cost/  inventory/  playbook/  copilot/
+│   │       └── marketing/  menu-engineer/
+│   │
+│   ├── components/
+│   │   ├── places-autocomplete.tsx  # Google Places Autocomplete input
+│   │   └── ui/                      # shadcn/ui primitives (button, card, select, tabs, …)
+│   │
+│   └── lib/
+│       ├── places.ts                # Shared Google Places + OpenAI helpers (geocode, nearby, keys)
+│       ├── schemas.ts               # Zod validation schemas
+│       └── utils.ts                 # cn() class helper
+│
+├── scripts/
+│   └── screenshots.mjs              # Playwright script that generates docs/screenshots/*.png
+├── docs/screenshots/               # README images
+├── public/                          # Static assets
+├── .env.example                     # Template for the two required API keys
+└── package.json
+```
+
+Each feature follows the same shape: an **input page** (`/feature`) → a
+**server API route** (`/api/feature`) that calls GPT-4o (and Google Places for
+the Locate tools) → a **report page** (`/feature-report/[id]`) that reads the
+result from `localStorage`. The Operations Copilot is the one exception — it's a
+chat UI with no separate report page.
+
+## Generating screenshots
+
+The images in [Screenshots](#screenshots) are produced by a Playwright script
+against the running app. Playwright is **not** a project dependency, so install
+it on demand:
+
+```bash
+npm install --save-dev playwright   # one-time
+npx playwright install chromium     # downloads the browser
+
+npm run build
+PORT=3100 npm run start              # serve the app in one terminal
+
+npm run screenshots                  # in another terminal → writes docs/screenshots/*.png
+```
+
+The script captures the landing page and the main tool screens (no API keys
+required for those — the forms render without them).
