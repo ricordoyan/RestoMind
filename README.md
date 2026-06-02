@@ -1,8 +1,46 @@
 # Restaurant Co-Pilot
 
-An AI co-pilot for the **whole restaurant lifecycle** — from picking a site to
-running it day-to-day. Decide *where* to open against **real** competitor data
-(inspired by location-intelligence platforms like SiteZeus), open the doors,
+**Two core features:** an **AI phone agent** that answers calls and takes orders
+from your menu, and **menu engineering** that turns those orders (plus any you
+bulk-upload) into your most-ordered dishes, profit margins, and concrete
+pricing/menu actions.
+
+## Core features
+
+First, **set up your menu** (`/menu-setup`) — each dish with its sell price and
+food cost. Both features build on it. Orders and menu are stored in the browser
+(`localStorage`) — no database required for the demo.
+
+### 1. AI Phone Order Agent (`/phone-agent`)
+A conversational GPT-4o agent answers the "call", greets the caller, only offers
+dishes from your menu, confirms items and quantities, and emits a **structured
+order** (items, unit prices, line totals, total). On confirmation the order is
+saved automatically. The page is an in-browser **call simulator** (type, or talk
+via the browser's speech recognition where available) so it works immediately —
+see [Going live with real phone calls](#going-live-with-real-phone-calls-twilio)
+to connect an actual phone number.
+
+### 2. Menu Engineering from orders (`/insights`)
+Phone orders flow straight in; you can also **bulk-upload** a day's or month's
+orders (`Dish, qty` / `Dish xN`, one per line). The app computes — deterministically —
+most-ordered dishes, revenue, and **profit margins**, renders charts, then GPT-4o
+classifies each dish into the classic menu-engineering matrix (**Stars /
+Plowhorses / Puzzles / Dogs**) with recommendations and pricing actions.
+
+### Going live with real phone calls (Twilio)
+The in-browser agent is fully functional today. To answer a **real** phone
+number, point a [Twilio Voice](https://www.twilio.com/docs/voice) webhook at a
+server route that drives the same `/api/order-agent` brain (greet →
+`<Gather input="speech">` → feed the transcript to the agent → `<Say>` the
+reply). Because that runs server-side, the **menu and orders must move from
+`localStorage` to a database** (e.g. Postgres/Supabase) keyed by your restaurant
+— that persistence layer is the main piece to add for production.
+
+---
+
+The app also retains a broader **restaurant-lifecycle toolkit** — from picking a
+site to running it day-to-day. Decide *where* to open against **real** competitor
+data (inspired by location-intelligence platforms like SiteZeus), open the doors,
 then run operations like a seasoned manager (inspired by operations platforms
 like Restoke.ai), and grow.
 
